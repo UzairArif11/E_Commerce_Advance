@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import axiosInstance from '../utils/axiosInstance';
+import { toast } from 'react-hot-toast';
 
 const stripePromise = loadStripe('pk_test_YourStripePublicKeyHere'); // Use your public key
 
@@ -24,7 +25,7 @@ const PlaceOrderForm = () => {
 
   const handlePlaceOrder = async (e) => {
     e.preventDefault();
-  
+     
     if (!stripe || !elements) return;
   
     setLoading(true);
@@ -47,7 +48,8 @@ const PlaceOrderForm = () => {
   
       if (result.error) {
         console.error('Payment failed', result.error.message);
-        alert(`Payment Failed: ${result.error.message}`);
+  
+        toast.error(`Payment Failed: ${result.error.message}`);
         setLoading(false);
       } else {
         if (result.paymentIntent.status === 'succeeded') {
@@ -61,8 +63,8 @@ const PlaceOrderForm = () => {
             shippingAddress,
             totalAmount,
           });
-  
-          alert('Payment Successful! 🎉 Order placed.');
+          toast.success('Payment Successful! 🎉 Order placed.');
+ 
           navigate('/orders');
         }
       }

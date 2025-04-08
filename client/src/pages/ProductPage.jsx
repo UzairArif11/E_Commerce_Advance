@@ -21,9 +21,9 @@ const ProductPage = () => {
         quantity: 1,
       })
     );
-    console.log("Before adding to cart", product._id);
+    
     toast.success('Added to cart!');
-    console.log("After adding to cart", product._id);
+  
   };
 
   useEffect(() => {
