@@ -11,9 +11,9 @@ const authSlice = createSlice({
   reducers: {
     loginSuccess(state, action) {
       state.userInfo = action.payload;
-      localStorage.setItem('userInfo', JSON.stringify(action.payload));
+      localStorage.setItem('userInfo', JSON.stringify(action.payload.userInfo));
       localStorage.setItem('token', action.payload.token); // Save JWT token
-      localStorage.setItem('userId', action.payload.userId); // Save userId separately
+      localStorage.setItem('userId', action.payload.userInfo._id); // Save userId separately
     },
     logout(state) {
       state.userInfo = null;

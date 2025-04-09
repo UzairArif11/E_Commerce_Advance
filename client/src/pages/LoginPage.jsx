@@ -17,8 +17,8 @@ const LoginPage = () => {
       const { data } = await axiosInstance.post('/auth/login', { email, password });
       dispatch(loginSuccess({
         token: data.token,
-        userId: data.user.id,
-        email: email,
+        userInfo: data.user ,
+       
       }));
       navigate('/');
     } catch (error) {

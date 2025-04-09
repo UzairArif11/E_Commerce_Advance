@@ -58,12 +58,13 @@ exports.login = async (req, res) => {
     if (!user.isVerified) {
       return res.status(400).json({ errors: [{ msg: 'Please verify your email before logging in.' }] });
     }
+    const { password: _, ...other } = user.toObject();
 
     // Generate JWT Token for the authenticated user
     const payload = { user: { id: user.id } };
     jwt.sign(payload, config.JWT_SECRET, { expiresIn: 360000 }, (err, token) => {
       if (err) throw err;
-      res.json({ token ,user: { id: user.id }});
+      res.json({ token ,user: other});
     });
   } catch (err) {
     console.error('Error in login:', err.message);
