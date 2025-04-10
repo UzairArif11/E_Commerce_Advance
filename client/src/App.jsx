@@ -14,8 +14,9 @@ import AdminDashboard from "./pages/AdminDashboard";
 import AdminRoute from "./components/AdminRoute";
 import AdminProductsPage from "./pages/AdminProductsPage";
 import AdminAddProductPage from "./pages/AdminAddProductPage";
-import AdminEditProductPage from './pages/AdminEditProductPage';
- 
+import AdminEditProductPage from "./pages/AdminEditProductPage";
+import AdminOrdersPage from "./pages/AdminOrdersPage";
+import AdminUsersPage from "./pages/AdminUsersPage";
 function App() {
   return (
     <Router>
@@ -85,6 +86,25 @@ function App() {
             element={
               <AdminRoute>
                 <AdminEditProductPage />
+              </AdminRoute>
+            }
+          />
+
+          <Route
+            path="/admin/orders"
+            element={
+              <AdminRoute>
+                {" "}
+                <AdminOrdersPage />{" "}
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/admin/users"
+            element={
+              <AdminRoute>
+                {" "}
+                <AdminUsersPage />{" "}
               </AdminRoute>
             }
           />

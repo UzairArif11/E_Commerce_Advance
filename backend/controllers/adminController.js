@@ -28,6 +28,18 @@ exports.getAllUsers = async (req, res) => {
     res.status(500).json({ msg: "Server error" });
   }
 };
+exports.getAllOrders = async (req, res) => {
+  try {
+    const orders = await Order.find()
+    .populate('products.product', 'name price')
+    .populate('user', 'name email')
+    .sort({ createdAt: -1 });
+    res.json(orders);
+  } catch (error) {
+    console.error("Error fetching orders:", error.message);
+    res.status(500).json({ msg: "Server error" });
+  }
+};
 exports.deleteUser = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);

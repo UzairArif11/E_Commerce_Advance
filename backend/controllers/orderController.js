@@ -3,9 +3,25 @@ const Order = require('../models/Order');
 
 exports.createOrder = async (req, res) => {
   const { user, products, shippingAddress, totalAmount } = req.body;
+
   try {
+    // Use the user ID from the request or fallback to the authenticated user
+    let orderUser;
+    if (req.user.role !== 'admin'  ) {
+      const userId = req.user.id;
+      orderUser= userId;
+    }else{
+      orderUser = user;
+    }
+
     // Create a new order instance
-    const order = new Order({ user, products, shippingAddress, totalAmount });
+    const order = new Order({
+      user: orderUser,
+      products,
+      shippingAddress,
+      totalAmount,
+    });
+
     await order.save();
     res.status(201).json(order);
   } catch (err) {
@@ -13,6 +29,7 @@ exports.createOrder = async (req, res) => {
     res.status(500).send('Server error');
   }
 };
+
 
 exports.getOrderById = async (req, res) => {
   try {
@@ -37,6 +54,7 @@ exports.getUserOrders = async (req, res) => {
     res.status(500).send('Server error');
   }
 };
+
 
 exports.updateOrderStatus = async (req, res) => {
   const { status } = req.body;
