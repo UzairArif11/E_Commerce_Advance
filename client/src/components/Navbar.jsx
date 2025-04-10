@@ -1,6 +1,6 @@
-import { Link } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { logout } from '../redux/slices/authSlice';
+import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../redux/slices/authSlice";
 
 const Navbar = () => {
   const dispatch = useDispatch();
@@ -27,10 +27,16 @@ const Navbar = () => {
 
           {userInfo ? (
             <>
+              <Link to="/profile" className="text-gray-600 hover:text-blue-600">
+                Profile
+              </Link>
               <Link to="/orders" className="text-gray-600 hover:text-blue-600">
                 Orders
               </Link>
-              <button onClick={handleLogout} className="text-gray-600 hover:text-red-600">
+              <button
+                onClick={handleLogout}
+                className="text-gray-600 hover:text-red-600"
+              >
                 Logout
               </button>
             </>
@@ -39,7 +45,10 @@ const Navbar = () => {
               <Link to="/login" className="text-gray-600 hover:text-blue-600">
                 Login
               </Link>
-              <Link to="/register" className="text-gray-600 hover:text-blue-600">
+              <Link
+                to="/register"
+                className="text-gray-600 hover:text-blue-600"
+              >
                 Register
               </Link>
             </>

@@ -5,6 +5,7 @@ const router = express.Router();
 const categoryController = require("../controllers/categoryController");
 const { adminAuth } = require("../middlewares/authMiddleware");
 const validateRequest = require("../middlewares/validationMiddleware");
+
 // @route GET /api/categories // @desc Get all categories // @access Public
  router.get('/', categoryController.getAllCategories);
 // @route POST /api/categories // @desc Add a new category // @access Protected (Admin)

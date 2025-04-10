@@ -17,6 +17,8 @@ import AdminAddProductPage from "./pages/AdminAddProductPage";
 import AdminEditProductPage from "./pages/AdminEditProductPage";
 import AdminOrdersPage from "./pages/AdminOrdersPage";
 import AdminUsersPage from "./pages/AdminUsersPage";
+import UserProfilePage from "./pages/UserProfilePage";
+
 function App() {
   return (
     <Router>
@@ -106,6 +108,25 @@ function App() {
                 {" "}
                 <AdminUsersPage />{" "}
               </AdminRoute>
+            }
+          />
+
+          <Route
+            path="/profile"
+            element={
+              <PrivateRoute>
+                <UserProfilePage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="*"
+            element={
+              <div className="flex justify-center items-center h-screen">
+                <h1 className="text-4xl font-bold text-gray-800">
+                  404 - Page Not Found
+                </h1>
+              </div>
             }
           />
         </Routes>
