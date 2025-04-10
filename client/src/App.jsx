@@ -14,6 +14,8 @@ import AdminDashboard from "./pages/AdminDashboard";
 import AdminRoute from "./components/AdminRoute";
 import AdminProductsPage from "./pages/AdminProductsPage";
 import AdminAddProductPage from "./pages/AdminAddProductPage";
+import AdminEditProductPage from './pages/AdminEditProductPage';
+ 
 function App() {
   return (
     <Router>
@@ -73,8 +75,16 @@ function App() {
             path="/admin/products/create"
             element={
               <AdminRoute>
-                
                 <AdminAddProductPage />
+              </AdminRoute>
+            }
+          />
+
+          <Route
+            path="/admin/products/edit/:id"
+            element={
+              <AdminRoute>
+                <AdminEditProductPage />
               </AdminRoute>
             }
           />
