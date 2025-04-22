@@ -24,6 +24,9 @@ const Navbar = () => {
           <Link to="/cart" className="text-gray-600 hover:text-blue-600">
             Cart
           </Link>
+          <Link to="/wishlist" className="text-gray-600 hover:text-blue-600">
+            Wishlist
+          </Link>
 
           {userInfo ? (
             <>

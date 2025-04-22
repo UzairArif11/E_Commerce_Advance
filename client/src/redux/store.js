@@ -4,6 +4,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import cartReducer from './slices/cartSlice';
 import checkoutReducer from './slices/checkoutSlice';
 import authReducer from './slices/authSlice';
+import wishlistReducer from './slices/wishlistSlice';
 import { saveCartToLocalStorage } from '../utils/localStorageHelpers';
 
  
@@ -25,6 +26,7 @@ export const store =configureStore({
   reducer: { cart: cartReducer,
     checkout: checkoutReducer,
     auth: authReducer,
+    wishlist: wishlistReducer,
    },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(cartLocalStorageMiddleware),

@@ -1,12 +1,39 @@
-// src/components/ProductCard.jsx
+import { useDispatch, useSelector } from 'react-redux';
+import { addToWishlist, removeFromWishlist } from '../redux/slices/wishlistSlice';
 import { Link } from 'react-router-dom';
 
 const ProductCard = ({ product }) => {
+  const dispatch = useDispatch();
+  const { wishlistItems } = useSelector((state) => state.wishlist);
+
+  const isWishlisted = wishlistItems.some((item) => item.productId === product._id);
+
+  const toggleWishlist = () => {
+    if (isWishlisted) {
+      dispatch(removeFromWishlist(product._id));
+    } else {
+      dispatch(addToWishlist({
+        productId: product._id,
+        name: product.name,
+        price: product.price,
+        image: product.image,
+      }));
+    }
+  };
+
   return (
-    <div className="border rounded-lg overflow-hidden shadow hover:shadow-lg transition-all">
+    <div className="border rounded-lg overflow-hidden shadow hover:shadow-lg transition-all relative">
+      {/* Heart Button */}
+      <button
+        onClick={toggleWishlist}
+        className="absolute top-2 right-2 bg-white p-2 rounded-full shadow hover:scale-110 transition"
+      >
+        {isWishlisted ? '❤️' : '🤍'}
+      </button>
+
       <Link to={`/product/${product._id}`}>
         <img
-          src={product.image || 'https://via.placeholder.com/300'} // Placeholder if no image
+          src={product.image || 'https://via.placeholder.com/300'}
           alt={product.name}
           className="w-full h-48 object-cover"
         />

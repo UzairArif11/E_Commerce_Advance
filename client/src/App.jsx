@@ -18,6 +18,8 @@ import AdminEditProductPage from "./pages/AdminEditProductPage";
 import AdminOrdersPage from "./pages/AdminOrdersPage";
 import AdminUsersPage from "./pages/AdminUsersPage";
 import UserProfilePage from "./pages/UserProfilePage";
+import WishlistPage from './pages/WishlistPage';
+
 
 function App() {
   return (
@@ -129,6 +131,16 @@ function App() {
               </div>
             }
           />
+
+<Route
+  path="/wishlist"
+  element={
+    <PrivateRoute>
+      <WishlistPage />
+    </PrivateRoute>
+  }
+/>
+
         </Routes>
       </Layout>
     </Router>
