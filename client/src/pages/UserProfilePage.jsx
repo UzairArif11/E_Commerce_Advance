@@ -19,7 +19,7 @@ const UserProfilePage = () => {
 
   const fetchUserOrders = async () => {
     try {
-      const { data } = await axiosInstance.get(`/orders/user/${userInfo?._id}`);
+      const { data } = await axiosInstance.get(`/orders/user/${userInfo?.user?._id}`);
       setOrders(data);
     } catch (error) {
       console.error("Error fetching user orders:", error.message);
@@ -31,7 +31,7 @@ const UserProfilePage = () => {
   const handleUpdateProfile = async (e) => {
     e.preventDefault();
     try {
-      const { data } = await axiosInstance.put(`/users/${userInfo._id}`, {
+      const { data } = await axiosInstance.put(`/users/${userInfo?.user?._id}`, {
         name,
         email,
         password: password ? password : undefined,
@@ -39,11 +39,11 @@ const UserProfilePage = () => {
 
       alert("Profile updated successfully!");
 
-      // 🔄 Update Redux + localStorage
+      // 🔄 Update Redux  
       dispatch(
         loginSuccess({
           userInfo: data.user, // assuming your controller returns { user }
-          token: localStorage.getItem("token"), // keep existing token
+          token: userInfo.token, // keep existing token
         })
       );
 
@@ -55,20 +55,21 @@ const UserProfilePage = () => {
   };
   
   useEffect(() => {
-    if (userInfo.name&&userInfo.email) {
-      setName(userInfo.name || "");
-      setEmail(userInfo.email || "");
+    if (userInfo?.user?.name&&userInfo?.user?.email) {
+      setName(userInfo?.user?.name || "");
+      setEmail(userInfo?.user?.email || "");
     }
-  }, [userInfo]);
+  }, [userInfo?.user]);
   useEffect(() => {
- 
-     userInfo._id&& fetchUserOrders();
+    if (userInfo?.user?._id) {
+      fetchUserOrders();
+    }
+  }, [userInfo?.user?._id]);
   
-  }, [userInfo, navigate]);
-
-  if (!userInfo) {
+  if (!userInfo?.user || (!name && !email)) {
     return <div className="text-center mt-20">Loading profile...</div>;
   }
+  
   
 
   return (

@@ -6,14 +6,15 @@ import { Link } from 'react-router-dom';
 
 const OrdersPage = () => {
   const { cartItems } = useSelector((state) => state.cart);
+  const { userInfo } = useSelector((state) => state.auth);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const userId = localStorage.getItem('userId'); // Assume userId is stored on login
-        const { data } = await axiosInstance.get(`/orders/user/${userId}`);
+ 
+        const { data } = await axiosInstance.get(`/orders/user/${userInfo?.user?._id}`);
         setOrders(data);
       } catch (error) {
         console.error('Error fetching orders:', error.message);

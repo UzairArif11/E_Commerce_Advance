@@ -1,10 +1,8 @@
-// src/redux/slices/cartSlice.js
 
 import { createSlice } from '@reduxjs/toolkit';
-import { loadCartFromLocalStorage } from '../../utils/localStorageHelpers';
 
 const initialState = {
-  cartItems: loadCartFromLocalStorage(), // Load cart from localStorage initially
+  cartItems: [],
 };
 
 const cartSlice = createSlice({
@@ -55,4 +53,3 @@ export const {
 } = cartSlice.actions;
 
 export default cartSlice.reducer;
-

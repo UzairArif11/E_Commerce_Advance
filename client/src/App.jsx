@@ -1,31 +1,42 @@
 // src/App.js
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import HomePage from "./pages/HomePage";
-import ProductPage from "./pages/ProductPage";
-import CartPage from "./pages/CartPage";
-import LoginPage from "./pages/LoginPage";
-import RegisterPage from "./pages/RegisterPage";
-import Layout from "./components/Layout";
-import CheckoutPage from "./pages/CheckoutPage";
-import PlaceOrderPage from "./pages/PlaceOrderPage";
-import OrdersPage from "./pages/OrdersPage";
-import PrivateRoute from "./components/PrivateRoute";
-import AdminDashboard from "./pages/AdminDashboard";
-import AdminRoute from "./components/AdminRoute";
-import AdminProductsPage from "./pages/AdminProductsPage";
-import AdminAddProductPage from "./pages/AdminAddProductPage";
-import AdminEditProductPage from "./pages/AdminEditProductPage";
-import AdminOrdersPage from "./pages/AdminOrdersPage";
-import AdminUsersPage from "./pages/AdminUsersPage";
-import UserProfilePage from "./pages/UserProfilePage";
-import WishlistPage from './pages/WishlistPage';
 
+
+
+import React, { Suspense, lazy } from 'react';
+import ErrorBoundary from './components/ErrorBoundary';
+
+const HomePage = lazy(() => import('./pages/HomePage'));
+const ProductPage = lazy(() => import('./pages/ProductPage'));
+const CartPage = lazy(() => import('./pages/CartPage'));
+const LoginPage = lazy(() => import('./pages/LoginPage'));
+const RegisterPage = lazy(() => import('./pages/RegisterPage'));
+import Layout from "./components/Layout";
+const CheckoutPage = lazy(() => import('./pages/CheckoutPage'));
+const PlaceOrderPage = lazy(() => import('./pages/PlaceOrderPage'));
+const OrdersPage = lazy(() => import('./pages/OrdersPage'));
+import PrivateRoute from "./components/PrivateRoute";
+import AdminRoute from "./components/AdminRoute";
+const UserProfilePage = lazy(() => import('./pages/UserProfilePage'));
+const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
+const AdminProductsPage = lazy(() => import('./pages/AdminProductsPage'));
+const AdminAddProductPage = lazy(() => import('./pages/AdminAddProductPage'));
+const AdminEditProductPage = lazy(() => import('./pages/AdminEditProductPage'));
+const AdminOrdersPage = lazy(() => import('./pages/AdminOrdersPage'));
+const AdminUsersPage = lazy(() => import('./pages/AdminUsersPage'));
+const WishlistPage = lazy(() => import('./pages/WishlistPage'));
 
 function App() {
   return (
-    <Router>
-      <Layout>
-        <Routes>
+    <ErrorBoundary>
+      <Router>
+        <Layout>
+          <Suspense fallback={
+            <div className="flex justify-center items-center h-screen">
+              <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
+          }>
+            <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/product/:id" element={<ProductPage />} />
           <Route path="/cart" element={<CartPage />} />
@@ -142,8 +153,10 @@ function App() {
 />
 
         </Routes>
+        </Suspense>
       </Layout>
     </Router>
+    </ErrorBoundary>
   );
 }
 

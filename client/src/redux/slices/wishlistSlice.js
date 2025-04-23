@@ -2,7 +2,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-  wishlistItems: JSON.parse(localStorage.getItem('wishlistItems')) || [],
+  wishlistItems:  [],
 };
 
 const wishlistSlice = createSlice({

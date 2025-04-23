@@ -14,7 +14,7 @@ const Navbar = () => {
     <nav className="bg-white shadow-md">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
         <Link to="/" className="text-2xl font-bold text-gray-800">
-          eShop
+         CMC
         </Link>
 
         <div className="flex space-x-6">

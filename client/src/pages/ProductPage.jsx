@@ -44,8 +44,8 @@ const ProductPage = () => {
     }
     try {
       const newReview = {
-        user: userInfo.userId,
-        name: userInfo.email,
+        user: userInfo?.user?._id,
+        name: userInfo?.user?.name,
         rating: ratingValue,
         comment: reviewText,
         createdAt: new Date().toISOString(),

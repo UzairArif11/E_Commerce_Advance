@@ -4,25 +4,24 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import { Provider } from 'react-redux';
-import { store } from './redux/store';
+import { store, persistor } from './redux/store'; // Assuming store.js now exports persistor
+import { PersistGate } from 'redux-persist/integration/react';
 import { Toaster } from 'react-hot-toast';
+import { injectStore } from './utils/axiosInstance'; // <-- injectStore
 
+injectStore(store); // Inject the Redux store into Axios
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <Provider store={store}>
-    <Toaster
-      position="top-right"
-      reverseOrder={false}
-      toastOptions={{
-        duration: 3000,
-        // style: {
-        //   background: '#333',
-        //   color: '#fff',
-        // }
-        
-        }}/>
-      
-    <App />
-  
+    <PersistGate loading={null} persistor={persistor}>
+      <Toaster
+        position="top-right"
+        reverseOrder={false}
+        toastOptions={{
+          duration: 3000,
+        }}
+      />
+      <App />
+    </PersistGate>
   </Provider>
 );
