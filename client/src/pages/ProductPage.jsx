@@ -35,11 +35,12 @@ const ProductPage = () => {
   // Dummy function to submit review
   const submitReview = async () => {
     if (!userInfo) {
-      alert("Please login to submit a review.");
+   toast.error("Please login to submit a review.");
+
       return;
     }
     if (!ratingValue || !reviewText) {
-      alert("Please fill in both rating and review.");
+       toast.error("Please fill in both rating and review.");
       return;
     }
     try {
@@ -53,10 +54,10 @@ const ProductPage = () => {
       setReviews([...reviews, newReview]);
       setReviewText("");
       setRatingValue(0);
-      alert("Review submitted!");
+      toast.success("Review submitted!");
     } catch (error) {
       console.error("Error submitting review:", error.message);
-      alert("Failed to submit review.");
+       toast.error("Failed to submit review.");
     }
   };
 

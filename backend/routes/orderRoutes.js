@@ -44,5 +44,6 @@ router.put(
   validateRequest,
   orderController.updateOrderStatus
 );
+router.put('/:id/cancel',  auth, orderController.cancelOrder);
 
 module.exports = router;

@@ -8,6 +8,7 @@ import { store, persistor } from './redux/store'; // Assuming store.js now expor
 import { PersistGate } from 'redux-persist/integration/react';
 import { Toaster } from 'react-hot-toast';
 import { injectStore } from './utils/axiosInstance'; // <-- injectStore
+import 'antd/dist/reset.css'; // AntD v5+ uses reset.css
 
 injectStore(store); // Inject the Redux store into Axios
 const root = ReactDOM.createRoot(document.getElementById('root'));

@@ -29,5 +29,16 @@ const sendOTPEmail = async (email, otp) => {
 
   await transporter.sendMail(mailOptions);
 };
+const sendEmail = async (options) => {
+  const mailOptions = {
+    from: `"eCommerce App" <${config.SMTP_USER}>`,
+    to: options.email,
+    subject: options.subject,
+    html: options.message,
+  };
 
-module.exports = { sendOTPEmail };
+  // Send email
+  await transporter.sendMail(mailOptions);
+};
+
+module.exports = { sendOTPEmail ,sendEmail};
