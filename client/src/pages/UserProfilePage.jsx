@@ -4,7 +4,6 @@ import { useSelector, useDispatch } from "react-redux";
 import axiosInstance from "../utils/axiosInstance";
 import { useNavigate } from "react-router-dom";
 import { loginSuccess } from '../redux/slices/authSlice';
-import io from 'socket.io-client';
 import { toast } from 'react-hot-toast';
 import { addNotification } from '../redux/slices/notificationSlice';
 
@@ -57,30 +56,7 @@ const UserProfilePage = () => {
     }
   };
  
-useEffect(() => {
-  if (!userInfo) return;
 
-  const socket = io('http://localhost:5000'); // Backend URL
-
-  socket.on(`user_${userInfo?.user?._id}_shipped`, (data) => {
-    toast.success(data.message);
-    dispatch(addNotification({ message: data.message, read: false }));
-  });
-
-  socket.on(`user_${userInfo?.user?._id}_cancelled`, (data) => {
-    toast.success(data.message);
-    dispatch(addNotification({ message: data.message, read: false }));
-  });
-
-  socket.on(`user_${userInfo?.user?._id}_delivered`, (data) => {
-    toast.success(data.message);
-    dispatch(addNotification({ message: data.message, read: false }));
-  });
-
-  return () => {
-    socket.disconnect();
-  };
-}, [userInfo]);
 
   useEffect(() => {
     if (userInfo?.user?.name&&userInfo?.user?.email) {

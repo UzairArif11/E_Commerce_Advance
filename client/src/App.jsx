@@ -1,7 +1,7 @@
 // src/App.js
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
-import React, { Suspense, lazy } from "react";
+import React, { Suspense, lazy, useEffect } from "react";
 import ErrorBoundary from "./components/ErrorBoundary";
 
 const HomePage = lazy(() => import("./pages/HomePage"));
@@ -29,9 +29,61 @@ const AdminNotificationsPage = lazy(() =>
 const NotificationsPage = lazy(() =>
   import("./pages/NotificationsPage")
 );
-
+import { toast } from 'react-hot-toast';
+import { addNotification } from './redux/slices/notificationSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import io from 'socket.io-client';
 
 function App() {
+  const { userInfo } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    if (!userInfo) return;
+   // App.js or wherever you're connecting
+const socket = io('http://localhost:5000', {
+  auth: {
+    token: userInfo?.token,
+  },
+});
+
+    // Listen to real-time events
+    socket.on(`user_shipped`, (data) => {
+      toast.success(data.message);
+      dispatch(addNotification({ message: data.message, read: false }));
+    });
+  
+    socket.on(`user_cancelled`, (data) => {
+      toast.success(data.message);
+      dispatch(addNotification({ message: data.message, read: false }));
+    });
+  
+    socket.on(`user_delivered`, (data) => {
+      toast.success(data.message);
+      dispatch(addNotification({ message: data.message, read: false }));
+    });
+  
+    socket.on('admin_orderPlaced', (data) => {
+      // setNotifications((prev) => [{ type: 'placed', ...data }, ...prev]);
+      dispatch(addNotification({type: 'placed', ...data, read: false }));
+       toast.success(data.message);
+    });
+
+    socket.on('admin_orderShipped', (data) => {
+      // setNotifications((prev) => [{ type: 'shipped', ...data }, ...prev]);
+       toast.success(data.message);
+       dispatch(addNotification({  type: 'shipped', ...data, read: false }));
+    });
+
+    socket.on('admin_orderCancelled', (data) => {
+      // setNotifications((prev) => [{ type: 'cancelled', ...data }, ...prev]);
+       toast.success(data.message);
+       dispatch(addNotification({ type: 'cancelled', ...data , read: false }));
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [userInfo]);
   return (
     <ErrorBoundary>
       <Router>

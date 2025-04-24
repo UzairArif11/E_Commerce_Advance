@@ -79,8 +79,8 @@ const Navbar = () => {
                   <MenuItem key={index}>{n.message}</MenuItem>
                 ))
               )}
-            </Menu>
             <MenuItem> <Link to="/notifications" className="text-blue-600 hover:underline"> See All Notifications </Link> </MenuItem>
+            </Menu>
           </div>
           </>
           ) : (

@@ -14,8 +14,8 @@ import {
   RemoveCircleOutline,
   DeleteOutline,
 } from '@mui/icons-material';
-import { markAllAsRead } from '../redux/slices/notificationSlice';
-
+import { markAllAsRead ,clearAllNotifications} from '../redux/slices/notificationSlice';
+ 
 const NotificationsPage = () => {
   const { notifications } = useSelector((state) => state.notifications);
   const dispatch = useDispatch();
@@ -36,6 +36,15 @@ const NotificationsPage = () => {
         >
           Mark All as Read
         </Button>
+        <Button
+  variant="contained"
+  color="error"
+  startIcon={<DeleteOutline />}
+  onClick={() => dispatch(clearAllNotifications())}
+>
+  Clear All
+</Button>
+
       </div>
 
       {notifications.length === 0 ? (

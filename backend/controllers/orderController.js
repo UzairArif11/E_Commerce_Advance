@@ -30,7 +30,7 @@ const userData = await User.findById(orderUser);
     await order.save();
   // After placing an 
   const io = getIO();
-io.emit('orderPlaced', {
+io.to('admin').emit('admin_orderPlaced', {
   message: `New order placed by ${userData.name}`,
   orderId: order._id,
 });
@@ -101,12 +101,13 @@ exports.updateOrderStatus = async (req, res) => {
   // If status changed to "shipped", send email
   if (status === 'shipped') {
     const io = getIO();
+    
 // After shipping an order
-io.emit(`user_${order.user._id}_shipped`, {
+io.to(order.user._id).emit(`user_shipped`, {
   message: `Your order #${order._id} has been shipped.`,
 });
 
-io.emit('orderShipped', {
+io.to('admin').emit('admin_orderShipped', {
   message: `Order shipped for ${order.user.name}`,
   orderId: order._id,
 });
@@ -144,12 +145,12 @@ io.emit('orderShipped', {
     const io = getIO();
 
 // When order is delivered
-io.emit(`user_${order.user._id}_delivered`, {
+io.to(order.user._id).emit(`user_delivered`, {
   message: `Your order #${order._id} has been delivered. Thank you!`,
 });
 
 
-io.emit('orderDelivered', {
+io.to('admin').emit('admin_orderDelivered', {
   message: `Order delivered for ${order.user.name}`,
   orderId: order._id,
 });
@@ -207,11 +208,11 @@ exports.cancelOrder = async (req, res) => {
   // After cancelling an order
 
   // When order is cancelled
-io.emit(`user_${order.user._id}_cancelled`, {
+io.to(order.user._id).emit(`user_cancelled`, {
   message: `Your order #${order._id} has been cancelled.`,
 });
 
-io.emit('orderCancelled', {
+io.to('admin').emit('admin_orderCancelled', {
   message: `Order cancelled by ${order.user.name}`,
   orderId: order._id,
 });
