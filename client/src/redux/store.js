@@ -6,6 +6,8 @@ import cartReducer from './slices/cartSlice';
 import checkoutReducer from './slices/checkoutSlice';
 import authReducer from './slices/authSlice';
 import wishlistReducer from './slices/wishlistSlice';
+import notificationReducer from './slices/notificationSlice';
+ 
 
 const authPersistConfig = {
   key: 'auth',
@@ -34,6 +36,7 @@ export const store = configureStore({
     checkout: checkoutReducer,
     auth: persistedAuthReducer,
     wishlist: persistedWishlistReducer,
+    notifications: notificationReducer
    },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

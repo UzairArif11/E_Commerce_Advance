@@ -2,28 +2,33 @@ import { useEffect, useState } from 'react';
 import io from 'socket.io-client';
 import { Timeline, TimelineItem, TimelineSeparator, TimelineConnector, TimelineContent, TimelineDot } from '@mui/lab';
 import { Typography } from '@mui/material';
- 
+import { toast } from 'react-hot-toast';
+import { addNotification } from '../redux/slices/notificationSlice';
+import { useDispatch } from 'react-redux';
 
 const socket = io('http://localhost:5000'); // Backend URL
 
 const AdminNotificationsPage = () => {
   const [notifications, setNotifications] = useState([]);
-
+  const dispatch = useDispatch();
   useEffect(() => {
     // Listen to real-time events
     socket.on('orderPlaced', (data) => {
       setNotifications((prev) => [{ type: 'placed', ...data }, ...prev]);
+      dispatch(addNotification({ message: data.message, read: false }));
        toast.success(data.message);
     });
 
     socket.on('orderShipped', (data) => {
       setNotifications((prev) => [{ type: 'shipped', ...data }, ...prev]);
        toast.success(data.message);
+       dispatch(addNotification({ message: data.message, read: false }));
     });
 
     socket.on('orderCancelled', (data) => {
       setNotifications((prev) => [{ type: 'cancelled', ...data }, ...prev]);
        toast.success(data.message);
+       dispatch(addNotification({ message: data.message, read: false }));
     });
 
     return () => {

@@ -102,6 +102,10 @@ exports.updateOrderStatus = async (req, res) => {
   if (status === 'shipped') {
     const io = getIO();
 // After shipping an order
+io.emit(`user_${order.user._id}_shipped`, {
+  message: `Your order #${order._id} has been shipped.`,
+});
+
 io.emit('orderShipped', {
   message: `Order shipped for ${order.user.name}`,
   orderId: order._id,
@@ -112,6 +116,48 @@ io.emit('orderShipped', {
       message: `
         <h1>Good news, ${order.user.name}!</h1>
         <h1 style="color: #4CAF50;">Your Package is on the Way! 🚚</h1>
+        <p>Order ID: <strong>#${order._id}</strong></p>
+        <p>Track your order status by logging into your profile.</p>
+        <a 
+          href="https://yourwebsite.com/profile" 
+          style="
+            background: #4CAF50; 
+            color: white; 
+            padding: 10px 20px; 
+            text-decoration: none; 
+            border-radius: 5px;
+            display: inline-block;
+            margin-top: 10px;
+          "
+        >
+          Track Order
+        </a>
+        <p style="margin-top: 20px;">
+          Thanks for choosing <strong>eShop</strong>!
+        </p>
+      `,
+    });
+    
+  }
+  // If status changed to "shipped", send email
+  if (status === 'delivered') {
+    const io = getIO();
+
+// When order is delivered
+io.emit(`user_${order.user._id}_delivered`, {
+  message: `Your order #${order._id} has been delivered. Thank you!`,
+});
+
+
+io.emit('orderDelivered', {
+  message: `Order delivered for ${order.user.name}`,
+  orderId: order._id,
+});
+    await sendEmail({
+      email: order.user.email,
+      subject: "Your Order is delivered - eShop 🚚",
+      message: `
+        <h1>Good news, ${order.user.name}!</h1>
         <p>Order ID: <strong>#${order._id}</strong></p>
         <p>Track your order status by logging into your profile.</p>
         <a 
@@ -151,14 +197,20 @@ exports.cancelOrder = async (req, res) => {
     return res.status(404).json({ message: 'Order not found' });
   }
 
-  // if (order.status !== 'pending') {
-  //   return res.status(400).json({ message: 'Cannot cancel, order already processed.' });
-  // }
+  if (order.status !== 'pending') {
+    return res.status(400).json({ message: 'Cannot cancel, order already processed.' });
+  }
 
   order.status = 'cancelled';
   await order.save();
   const io = getIO();
   // After cancelling an order
+
+  // When order is cancelled
+io.emit(`user_${order.user._id}_cancelled`, {
+  message: `Your order #${order._id} has been cancelled.`,
+});
+
 io.emit('orderCancelled', {
   message: `Order cancelled by ${order.user.name}`,
   orderId: order._id,

@@ -23,8 +23,14 @@ const AdminEditProductPage = lazy(() => import("./pages/AdminEditProductPage"));
 const AdminOrdersPage = lazy(() => import("./pages/AdminOrdersPage"));
 const AdminUsersPage = lazy(() => import("./pages/AdminUsersPage"));
 const WishlistPage = lazy(() => import("./pages/WishlistPage"));
-const AdminNotificationsPage = lazy(() => import("./pages/AdminNotificationsPage"));
- 
+const AdminNotificationsPage = lazy(() =>
+  import("./pages/AdminNotificationsPage")
+);
+const NotificationsPage = lazy(() =>
+  import("./pages/NotificationsPage")
+);
+
+
 function App() {
   return (
     <ErrorBoundary>
@@ -159,6 +165,16 @@ function App() {
                     {" "}
                     <AdminNotificationsPage />{" "}
                   </AdminRoute>
+                }
+              />
+
+              <Route
+                path="/notifications"
+                element={
+                  <PrivateRoute>
+                    {" "}
+                    <NotificationsPage />{" "}
+                  </PrivateRoute>
                 }
               />
             </Routes>
