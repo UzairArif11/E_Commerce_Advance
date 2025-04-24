@@ -2,6 +2,8 @@
 const Order = require('../models/Order');
 const User = require('../models/User');
 const { sendEmail } = require('../services/emailService');
+const { getIO } = require('../socket');
+
 
 exports.createOrder = async (req, res) => {
   const { user, products, shippingAddress, totalAmount } = req.body;
@@ -26,7 +28,12 @@ const userData = await User.findById(orderUser);
     });
 
     await order.save();
-  
+  // After placing an 
+  const io = getIO();
+io.emit('orderPlaced', {
+  message: `New order placed by ${userData.name}`,
+  orderId: order._id,
+});
 
 await sendEmail({
   email: userData.email,
@@ -93,6 +100,12 @@ exports.updateOrderStatus = async (req, res) => {
 
   // If status changed to "shipped", send email
   if (status === 'shipped') {
+    const io = getIO();
+// After shipping an order
+io.emit('orderShipped', {
+  message: `Order shipped for ${order.user.name}`,
+  orderId: order._id,
+});
     await sendEmail({
       email: order.user.email,
       subject: "Your Order is Shipped - eShop 🚚",
@@ -138,13 +151,18 @@ exports.cancelOrder = async (req, res) => {
     return res.status(404).json({ message: 'Order not found' });
   }
 
-  if (order.status !== 'pending') {
-    return res.status(400).json({ message: 'Cannot cancel, order already processed.' });
-  }
+  // if (order.status !== 'pending') {
+  //   return res.status(400).json({ message: 'Cannot cancel, order already processed.' });
+  // }
 
   order.status = 'cancelled';
   await order.save();
-
+  const io = getIO();
+  // After cancelling an order
+io.emit('orderCancelled', {
+  message: `Order cancelled by ${order.user.name}`,
+  orderId: order._id,
+});
   // Send Cancellation Email
   await sendEmail({
     email: order.user.email,
