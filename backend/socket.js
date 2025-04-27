@@ -23,11 +23,11 @@ module.exports = {
       try {
         const decoded = jwt.verify(token, config.JWT_SECRET);
       
-        const user = await User.findById( decoded.user.id);
+        const user = await User.findById( decoded.user._id);
         if (!user) {
           return res.status(403).json({ msg: "Access denied," });
         }
-        socket.userId  = decoded.user.id;
+        socket.userId  = decoded.user._id;
         socket.role = user.role;
         return next();
       } catch (err) {

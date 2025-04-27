@@ -33,10 +33,35 @@ import { toast } from 'react-hot-toast';
 import { addNotification } from './redux/slices/notificationSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import io from 'socket.io-client';
+import axiosInstance from './utils/axiosInstance';
+
+
 
 function App() {
   const { userInfo } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
+  const playNotificationSound = () => {
+    const audio = new Audio('/sounds/notification.mp3');
+    audio.play().catch((error) => {
+      console.warn('Notification sound not played:', error.message);
+    });
+  };
+  useEffect(() => {
+    const fetchNotificationsFromDB = async () => {
+      try {
+        const { data } = await axiosInstance.get('/notifications');
+        data.forEach((n) => {
+          dispatch(addNotification({_id:n._id, message: n.message, read: n.read }));
+        });
+      } catch (error) {
+        console.error('Failed to load notifications:', error.message);
+      }
+    };
+  
+    if (userInfo) {
+      fetchNotificationsFromDB();
+    }
+  }, [userInfo]);
   useEffect(() => {
     if (!userInfo) return;
    // App.js or wherever you're connecting
@@ -47,34 +72,45 @@ const socket = io('http://localhost:5000', {
 });
 
     // Listen to real-time events
+   
     socket.on(`user_shipped`, (data) => {
+      playNotificationSound();
       toast.success(data.message);
       dispatch(addNotification({ message: data.message, read: false }));
     });
   
+   
     socket.on(`user_cancelled`, (data) => {
+      playNotificationSound();
       toast.success(data.message);
       dispatch(addNotification({ message: data.message, read: false }));
     });
   
+   
     socket.on(`user_delivered`, (data) => {
+      playNotificationSound();
       toast.success(data.message);
       dispatch(addNotification({ message: data.message, read: false }));
     });
   
+   
     socket.on('admin_orderPlaced', (data) => {
       // setNotifications((prev) => [{ type: 'placed', ...data }, ...prev]);
       dispatch(addNotification({type: 'placed', ...data, read: false }));
        toast.success(data.message);
     });
 
+   
     socket.on('admin_orderShipped', (data) => {
+      playNotificationSound();
       // setNotifications((prev) => [{ type: 'shipped', ...data }, ...prev]);
        toast.success(data.message);
        dispatch(addNotification({  type: 'shipped', ...data, read: false }));
     });
 
+   
     socket.on('admin_orderCancelled', (data) => {
+      playNotificationSound();
       // setNotifications((prev) => [{ type: 'cancelled', ...data }, ...prev]);
        toast.success(data.message);
        dispatch(addNotification({ type: 'cancelled', ...data , read: false }));

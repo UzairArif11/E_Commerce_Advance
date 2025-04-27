@@ -14,6 +14,13 @@ const notificationSlice = createSlice({
         n.read = true;
       });
     },
+    markNotificationAsRead: (state, action) => {
+      const notification = state.notifications.find((n) => n._id === action.payload);
+      if (notification) {
+        notification.read = true;
+      }
+    },
+    
     clearAllNotifications: (state) => {
       state.notifications = [];
     },
@@ -21,5 +28,5 @@ const notificationSlice = createSlice({
   },
 });
 
-export const { addNotification, markAllAsRead, clearAllNotifications } = notificationSlice.actions;
+export const { addNotification, markAllAsRead,markNotificationAsRead, clearAllNotifications } = notificationSlice.actions;
 export default notificationSlice.reducer;

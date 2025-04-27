@@ -3,6 +3,7 @@ const Order = require('../models/Order');
 const User = require('../models/User');
 const { sendEmail } = require('../services/emailService');
 const { getIO } = require('../socket');
+const Notification = require('../models/Notification');
 
 
 exports.createOrder = async (req, res) => {
@@ -12,7 +13,7 @@ exports.createOrder = async (req, res) => {
     // Use the user ID from the request or fallback to the authenticated user
     let orderUser;
     if (req.user.role !== 'admin'  ) {
-      const userId = req.user.id;
+      const userId = req.user._id;
       orderUser= userId;
     }else{
       orderUser = user;
@@ -26,6 +27,11 @@ const userData = await User.findById(orderUser);
       shippingAddress,
       totalAmount,
     });
+// Order Shipped Example
+await Notification.create({
+  user: orderUser,
+  message:  `New order placed by ${userData.name}`,
+});
 
     await order.save();
   // After placing an 
@@ -101,7 +107,13 @@ exports.updateOrderStatus = async (req, res) => {
   // If status changed to "shipped", send email
   if (status === 'shipped') {
     const io = getIO();
-    
+// Order Shipped Example
+await Notification.create({
+  user: order.user._id,
+  message: `Your order #${order._id} has been shipped.`,
+});
+
+
 // After shipping an order
 io.to(order.user._id).emit(`user_shipped`, {
   message: `Your order #${order._id} has been shipped.`,
@@ -143,6 +155,12 @@ io.to('admin').emit('admin_orderShipped', {
   // If status changed to "shipped", send email
   if (status === 'delivered') {
     const io = getIO();
+ 
+await Notification.create({
+  user: order.user._id,
+  message: `Your order #${order._id} has been delivered.`,
+});
+
 
 // When order is delivered
 io.to(order.user._id).emit(`user_delivered`, {
@@ -206,6 +224,12 @@ exports.cancelOrder = async (req, res) => {
   await order.save();
   const io = getIO();
   // After cancelling an order
+// Order Shipped Example
+await Notification.create({
+  user: order.user._id,
+  message: `Your order #${order._id} has been cancelled.`,
+});
+
 
   // When order is cancelled
 io.to(order.user._id).emit(`user_cancelled`, {

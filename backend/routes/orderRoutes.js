@@ -4,7 +4,7 @@ const { check } = require('express-validator');
 const router = express.Router();
 const orderController = require('../controllers/orderController');
 const validateRequest = require('../middlewares/validationMiddleware');
-const { auth } = require('../middlewares/authMiddleware');
+const { auth,adminAuth } = require('../middlewares/authMiddleware');
 
 // @route   POST /api/orders
 // @desc    Create a new order
@@ -41,7 +41,7 @@ router.put(
     check('status', 'Status must be one of: pending, shipped, delivered, cancelled')
       .isIn(['pending', 'shipped', 'delivered', 'cancelled']),
   ],
-  validateRequest,
+  validateRequest,  adminAuth,
   orderController.updateOrderStatus
 );
 router.put('/:id/cancel',  auth, orderController.cancelOrder);
