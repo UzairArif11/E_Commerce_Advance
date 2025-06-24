@@ -2,6 +2,34 @@
 const User = require("../models/User");
 const Order = require("../models/Order");
 const Product = require("../models/Product");
+const Notification = require('../models/Notification');
+const { getIO } = require('../socket');
+
+exports.broadcastNotification = async (req, res) => {
+  const { message } = req.body;
+
+  const users = await User.find({});
+
+  // Save notification for all users
+  for (const user of users) {
+    await Notification.create({
+      user: user._id,
+      type: 'broadcast',
+      message,
+    });
+    const io = getIO();
+    // Emit live notification to connected users
+    console.log(`Broadcasting notification to user ${user._id},message: ${message}`);
+    io.to(user._id.toString()).emit(`user_broadcast`, {
+      message,
+    });
+
+  }
+
+  res.json({ message: 'Notification broadcasted to all users.' });
+};
+
+
 exports.getDashboardStats = async (req, res) => {
   try {
     const userCount = await User.countDocuments();

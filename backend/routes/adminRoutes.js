@@ -3,6 +3,9 @@ const express = require("express");
 const router = express.Router();
 const adminController = require("../controllers/adminController");
 const { adminAuth } = require("../middlewares/authMiddleware");
+  
+// Only admin can broadcast
+router.post('/broadcast', adminAuth, adminController.broadcastNotification);
 // @route GET /api/admin/dashboard // @desc Get dashboard statistics // @access Protected (Admin)
 router.get("/dashboard", adminAuth, adminController.getDashboardStats);
 // @route GET /api/admin/orders // @desc Get orders statistics // @access Protected (Admin)

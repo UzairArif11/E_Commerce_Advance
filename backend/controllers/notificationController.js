@@ -1,10 +1,25 @@
 const Notification = require('../models/Notification');
 
 const getUserNotifications = async (req, res) => {
+  const page = Number(req.query.page) || 1;
+  const limit = Number(req.query.limit) || 10;
 
-  const notifications = await Notification.find({ user: req.user._id}).sort({ createdAt: -1 });
-  res.json(notifications);
+  const skip = (page - 1) * limit;
+
+  const notifications = await Notification.find({ user: req.user._id })
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit);
+
+  const total = await Notification.countDocuments({ user: req.user._id });
+
+  res.json({
+    notifications,
+    page,
+    pages: Math.ceil(total / limit),
+  });
 };
+
 
 const clearUserNotifications = async (req, res) => {
   await Notification.deleteMany({ user: req.user._id });

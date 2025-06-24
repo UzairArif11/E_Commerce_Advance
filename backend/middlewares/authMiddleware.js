@@ -10,6 +10,8 @@ exports.auth = async (req, res, next) => {
   }
   try {
     const decoded = jwt.verify(token, config.JWT_SECRET);
+    // console.log("Decoded JWT:", decoded);
+   
     req.user = decoded.user;
     // Assuming payload: { user: { id: user.id } }
     next();
@@ -22,7 +24,8 @@ exports.adminAuth = async (req, res, next) => {
   // First, ensure the user is authenticated
   await exports.auth(req, res, async () => {
     // Retrieve the user details from the database
-    const user = await User.findById(req.user.id);
+    const user = await User.findById(req.user._id);
+    
     if (!user || user.role !== "admin") {
       return res.status(403).json({ msg: "Access denied, admin only" });
     }

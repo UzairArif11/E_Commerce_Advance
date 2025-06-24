@@ -30,6 +30,7 @@ const userData = await User.findById(orderUser);
 // Order Shipped Example
 await Notification.create({
   user: orderUser,
+  type: 'placed',
   message:  `New order placed by ${userData.name}`,
 });
 
@@ -110,12 +111,13 @@ exports.updateOrderStatus = async (req, res) => {
 // Order Shipped Example
 await Notification.create({
   user: order.user._id,
+   type: 'shipped',
   message: `Your order #${order._id} has been shipped.`,
 });
 
 
 // After shipping an order
-io.to(order.user._id).emit(`user_shipped`, {
+io.to(order.user._id.toString()).emit(`user_shipped`, {
   message: `Your order #${order._id} has been shipped.`,
 });
 
@@ -158,12 +160,13 @@ io.to('admin').emit('admin_orderShipped', {
  
 await Notification.create({
   user: order.user._id,
+   type: 'delivered',
   message: `Your order #${order._id} has been delivered.`,
 });
 
 
 // When order is delivered
-io.to(order.user._id).emit(`user_delivered`, {
+io.to(order.user._id.toString()).emit(`user_delivered`, {
   message: `Your order #${order._id} has been delivered. Thank you!`,
 });
 
@@ -227,12 +230,13 @@ exports.cancelOrder = async (req, res) => {
 // Order Shipped Example
 await Notification.create({
   user: order.user._id,
+   type: 'cancelled',
   message: `Your order #${order._id} has been cancelled.`,
 });
 
 
   // When order is cancelled
-io.to(order.user._id).emit(`user_cancelled`, {
+io.to(order.user._id.toString()).emit(`user_cancelled`, {
   message: `Your order #${order._id} has been cancelled.`,
 });
 
