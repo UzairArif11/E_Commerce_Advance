@@ -8,7 +8,8 @@ import { Elements, CardElement, useStripe, useElements } from '@stripe/react-str
 import axiosInstance from '../utils/axiosInstance';
 import { toast } from 'react-hot-toast';
 
-const stripePromise = loadStripe('pk_test_YourStripePublicKeyHere'); // Use your public key
+  
+const stripePromise = loadStripe(import.meta.env.VITE_APP_STRIPE_PUBLISHABLE_KEY)
 
 const PlaceOrderForm = () => {
   const { cartItems } = useSelector((state) => state.cart);
@@ -37,6 +38,7 @@ const PlaceOrderForm = () => {
       } = await axiosInstance.post('/payments/stripe', {
         amount: totalAmount * 100, // Stripe expects amount in cents
         currency: 'usd',
+        cartItems
       });
   
       // 2. Confirm card payment

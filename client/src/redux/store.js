@@ -25,15 +25,21 @@ const wishlistPersistConfig = {
   storage,
   whitelist: ['wishlistItems']
 };
+const checkoutPersistConfig = {
+  key: 'checkout',
+  storage,
+  whitelist: ['shippingAddress', 'paymentMethod']
+};
 
 const persistedAuthReducer = persistReducer(authPersistConfig, authReducer);
 const persistedCartReducer = persistReducer(cartPersistConfig, cartReducer);
+const persistedCheckoutReducer = persistReducer(checkoutPersistConfig, checkoutReducer);
 const persistedWishlistReducer = persistReducer(wishlistPersistConfig, wishlistReducer);
 
 export const store = configureStore({
   reducer: {
     cart: persistedCartReducer,
-    checkout: checkoutReducer,
+    checkout: persistedCheckoutReducer,
     auth: persistedAuthReducer,
     wishlist: persistedWishlistReducer,
     notifications: notificationReducer

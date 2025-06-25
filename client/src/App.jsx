@@ -92,7 +92,7 @@ useEffect(() => {
   useEffect(() => {
     if (!userInfo) return;
     // App.js or wherever you're connecting
-    const socket = io("http://localhost:5000", {
+    const socket = io(import.meta.env.VITE_APP_SOCKET_URL, {
       auth: {
         token: userInfo?.token,
       },
