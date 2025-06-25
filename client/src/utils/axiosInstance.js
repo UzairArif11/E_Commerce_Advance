@@ -7,6 +7,7 @@ export const injectStore = (_store) => {
   store = _store;
 };
 
+// Create instance
 const axiosInstance = axios.create({
   baseURL: 'http://localhost:5000/api',
   headers: {
@@ -14,15 +15,32 @@ const axiosInstance = axios.create({
   },
 });
 
+// REQUEST Interceptor: Add token from Redux
 axiosInstance.interceptors.request.use((config) => {
   if (store) {
     const token = store.getState().auth.userInfo?.token;
-    console.log(store,"store..",token)
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
     }
   }
   return config;
 });
+
+// RESPONSE Interceptor: Handle 401 or accessRight == 4
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const status = error?.response?.status;
+  
+
+    if (status === 401  ) {
+// If the user is not authenticated, logout and redirect to login
+alert("You are not authenticated. Please log in again.");
+    
+    }
+
+    return Promise.reject(error);
+  }
+);
 
 export default axiosInstance;

@@ -12,6 +12,17 @@ import 'antd/dist/reset.css'; // AntD v5+ uses reset.css
 
 injectStore(store); // Inject the Redux store into Axios
 const root = ReactDOM.createRoot(document.getElementById('root'));
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker
+    .register('/service-worker.js')
+    .then(function (registration) {
+      console.log('Service Worker registered with scope:', registration.scope);
+    })
+    .catch(function (error) {
+      console.log('Service Worker registration failed:', error);
+    });
+}
+
 root.render(
   <Provider store={store}>
     <PersistGate loading={null} persistor={persistor}>
@@ -19,7 +30,7 @@ root.render(
         position="top-right"
         reverseOrder={false}
         toastOptions={{
-          duration: 3000,
+          duration: 5000,
         }}
       />
       <App />

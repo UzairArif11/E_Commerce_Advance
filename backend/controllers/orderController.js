@@ -41,6 +41,7 @@ io.to('admin').emit('admin_orderPlaced', {
   message: `New order placed by ${userData.name}`,
   orderId: order._id,
 });
+if (userData.wantsEmailNotifications) { 
 
 await sendEmail({
   email: userData.email,
@@ -57,7 +58,7 @@ await sendEmail({
     <img src="https://your-logo-link.com/logo.png" alt="eShop Logo" width="100"/>
   `,
 });
-
+ }
     res.status(201).json(order);
   } catch (err) {
     console.error('Error creating order:', err.message);
@@ -96,7 +97,7 @@ exports.updateOrderStatus = async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
 
-  const order = await Order.findById(id).populate('user', 'email name');
+  const order = await Order.findById(id).populate('user', 'email name wantsEmailNotifications');
 
   if (!order) {
     return res.status(404).json({ message: 'Order not found' });
@@ -125,6 +126,7 @@ io.to('admin').emit('admin_orderShipped', {
   message: `Order shipped for ${order.user.name}`,
   orderId: order._id,
 });
+if (order.user.wantsEmailNotifications) { 
     await sendEmail({
       email: order.user.email,
       subject: "Your Order is Shipped - eShop 🚚",
@@ -152,7 +154,7 @@ io.to('admin').emit('admin_orderShipped', {
         </p>
       `,
     });
-    
+  }
   }
   // If status changed to "shipped", send email
   if (status === 'delivered') {
@@ -175,6 +177,7 @@ io.to('admin').emit('admin_orderDelivered', {
   message: `Order delivered for ${order.user.name}`,
   orderId: order._id,
 });
+if (order.user.wantsEmailNotifications) { 
     await sendEmail({
       email: order.user.email,
       subject: "Your Order is delivered - eShop 🚚",
@@ -203,6 +206,7 @@ io.to('admin').emit('admin_orderDelivered', {
     });
     
   }
+  }
 
   res.status(200).json({
     message: 'Order status updated',
@@ -213,7 +217,7 @@ io.to('admin').emit('admin_orderDelivered', {
 exports.cancelOrder = async (req, res) => {
   const { id } = req.params;
 
-  const order = await Order.findById(id).populate('user', 'email name');
+  const order = await Order.findById(id).populate('user', 'email name wantsEmailNotifications');
 
   if (!order) {
     return res.status(404).json({ message: 'Order not found' });
@@ -245,6 +249,7 @@ io.to('admin').emit('admin_orderCancelled', {
   orderId: order._id,
 });
   // Send Cancellation Email
+  if (order.user.wantsEmailNotifications) { 
   await sendEmail({
     email: order.user.email,
     subject: 'Order Cancelled - eShop',
@@ -258,7 +263,7 @@ io.to('admin').emit('admin_orderCancelled', {
       <p><strong>eShop Team</strong></p>
     `,
   });
-
+  }
   res.status(200).json({ message: 'Order cancelled successfully', order });
 };
 

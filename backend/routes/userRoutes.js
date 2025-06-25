@@ -3,6 +3,9 @@ const express = require('express');
 const { check } = require('express-validator');
 const router = express.Router();
 const validateRequest = require('../middlewares/validationMiddleware');
+const { auth } = require('../middlewares/authMiddleware');
+
+ router.put('/settings', auth,  userController.updateUserSettings);
 router.put(
     "/:id",
     [

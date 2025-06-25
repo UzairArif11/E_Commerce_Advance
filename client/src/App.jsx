@@ -24,7 +24,8 @@ const AdminOrdersPage = lazy(() => import("./pages/AdminOrdersPage"));
 const AdminUsersPage = lazy(() => import("./pages/AdminUsersPage"));
 const WishlistPage = lazy(() => import("./pages/WishlistPage"));
 const AdminBroadcastPage = lazy(() => import("./pages/AdminBroadcastPage"));
-
+const UserSettingsPage = lazy(() => import("./pages/UserSettingsPage"));
+ 
 const AdminNotificationsPage = lazy(() =>
   import("./pages/AdminNotificationsPage")
 );
@@ -44,6 +45,32 @@ function App() {
       console.warn("Notification sound not played:", error.message);
     });
   };
+const sendBrowserNotification = (title, body) => {
+  if (
+    userInfo?.wantsPushNotifications &&
+    Notification.permission === 'granted'
+  ) {
+    navigator.serviceWorker.ready.then((registration) => {
+      registration.showNotification(title, {
+        body,
+             icon: '/vite.svg',
+      });
+    });
+  }
+};
+
+
+const requestNotificationPermission = async () => {
+  if ('Notification' in window && Notification.permission !== 'granted') {
+    const permission = await Notification.requestPermission();
+    console.log('Notification permission status:', permission);
+  }
+};
+
+useEffect(() => {
+  requestNotificationPermission();
+}, []);
+
   useEffect(() => {
     const fetchNotificationsFromDB = async () => {
       try {
@@ -75,30 +102,42 @@ function App() {
 
     socket.on(`user_shipped`, (data) => {
       playNotificationSound();
+       sendBrowserNotification('New Announcement', data.message);
       toast.success(data.message);
       dispatch(addNotification({ message: data.message, read: false }));
     });
 
     socket.on(`user_cancelled`, (data) => {
       playNotificationSound();
+       sendBrowserNotification('New Announcement', data.message);
       toast.success(data.message);
       dispatch(addNotification({ message: data.message, read: false }));
     });
 
     socket.on(`user_delivered`, (data) => {
       playNotificationSound();
+       sendBrowserNotification('New Announcement', data.message);
       toast.success(data.message);
-      dispatch(addNotification({ message: data.message,    type: 'delivered',read: false }));
+      dispatch(
+        addNotification({
+          message: data.message,
+          type: "delivered",
+          read: false,
+        })
+      );
     });
 
     socket.on("admin_orderPlaced", (data) => {
+          playNotificationSound();
+       sendBrowserNotification('New Announcement', data.message);
       // setNotifications((prev) => [{ type: 'placed', ...data }, ...prev]);
-      dispatch(addNotification({ type: "placed", ...data, read: false }));
       toast.success(data.message);
+      dispatch(addNotification({ type: "placed", ...data, read: false }));
     });
 
     socket.on("admin_orderShipped", (data) => {
       playNotificationSound();
+       sendBrowserNotification('New Announcement', data.message);
       // setNotifications((prev) => [{ type: 'shipped', ...data }, ...prev]);
       toast.success(data.message);
       dispatch(addNotification({ type: "shipped", ...data, read: false }));
@@ -106,12 +145,14 @@ function App() {
 
     socket.on("admin_orderCancelled", (data) => {
       playNotificationSound();
+       sendBrowserNotification('New Announcement', data.message);
       // setNotifications((prev) => [{ type: 'cancelled', ...data }, ...prev]);
       toast.success(data.message);
       dispatch(addNotification({ type: "cancelled", ...data, read: false }));
     });
     socket.on(`user_broadcast`, (data) => {
       playNotificationSound();
+       sendBrowserNotification('New Announcement', data.message);
       toast.success(`Announcement: ${data.message}`);
       dispatch(addNotification({ message: data.message, read: false }));
     });
@@ -136,6 +177,15 @@ function App() {
               <Route path="/cart" element={<CartPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
+              <Route
+                path="/settings"
+                element={
+                  <PrivateRoute>
+                    
+                    <UserSettingsPage /> 
+                  </PrivateRoute>
+                }
+              />
               <Route
                 path="/checkout"
                 element={
