@@ -15,6 +15,7 @@ router.post(
     // check('user', 'User ID is required').notEmpty(),
     check('products', 'Products array is required and cannot be empty').isArray({ min: 1 }),
     check('shippingAddress', 'Shipping address is required').notEmpty(),
+    check('paymentMethod', 'paymentMethod is required').notEmpty(),
     check('totalAmount', 'Total amount must be a number greater than 0').isFloat({ gt: 0 }),
   ],
   auth,

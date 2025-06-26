@@ -1,8 +1,9 @@
 // src/pages/CheckoutPage.jsx
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setShippingAddress, setPaymentMethod } from '../redux/slices/checkoutSlice';
 import { useNavigate } from 'react-router-dom';
+import axiosInstance from "../utils/axiosInstance";
 
 const CheckoutPage = () => {
   const dispatch = useDispatch();
@@ -12,6 +13,18 @@ const CheckoutPage = () => {
   const [address, setAddress] = useState(shippingAddress || '');
   const [payment, setPayment] = useState(paymentMethod || 'Stripe');
   const [errors, setErrors] = useState({});
+
+    const [codAvailable, setCodAvailable] = useState(false);
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      const { data } = await axiosInstance.get('/settings');
+      setCodAvailable(data.codEnabled);
+    };
+
+    fetchSettings();
+
+  }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -56,7 +69,11 @@ const CheckoutPage = () => {
             <p className="text-red-500 text-sm mt-1">{errors.address}</p>
           )}
         </div>
-
+  {codAvailable ? (
+        <p>Cash on Delivery is available</p>
+      ) : (
+        <p>Cash on Delivery is not available</p>
+      )}
         {/* Payment Method */}
         <div>
           <label className="block text-gray-700 font-medium mb-4">Payment Method</label>
@@ -76,7 +93,14 @@ const CheckoutPage = () => {
             {errors.payment && (
               <p className="text-red-500 text-sm mt-1">{errors.payment}</p>
             )}
+            {codAvailable && 
+            ( 
+            <div> <input type="radio" name="paymentMethod" value="CashOnDelivery"   checked={payment === "CashOnDelivery" } onChange={(e) => setPayment(e.target.value)} />
+             <label className="ml-2">Cash On Delivery (+Rs 100 Extra)</label> 
+             </div>
+             )}
           </div>
+          
         </div>
 
         {/* Submit */}

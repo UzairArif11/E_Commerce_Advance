@@ -21,17 +21,18 @@ const PlaceOrderForm = () => {
 
   const totalAmount = cartItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
-    0
+    paymentMethod === 'CashOnDelivery'?100:0
   );
 
   const handlePlaceOrder = async (e) => {
-    e.preventDefault();
-     
-    if (!stripe || !elements) return;
-  
-    setLoading(true);
-  
+
+    
     try {
+      e.preventDefault();
+      if(paymentMethod === 'Stripe') {
+      if (!stripe || !elements) return;
+    
+      setLoading(true);
       // 1. Create a payment intent from backend
       const {
         data: { paymentIntent },
@@ -64,16 +65,38 @@ const PlaceOrderForm = () => {
             })),
             shippingAddress,
             totalAmount,
+ 
           });
           toast.success('Payment Successful! 🎉 Order placed.');
  
           navigate('/orders');
         }
       }
-    } catch (error) {
+
+
+   
+   }     else {
+       
+          await axiosInstance.post('/orders', {
+            products: cartItems.map((item) => ({
+              product: item.productId,
+              quantity: item.quantity,
+              price: item.price,
+            })),
+            shippingAddress,
+            totalAmount,
+            paymentMethod
+          });
+          toast.success('Payment Successful! 🎉 Order placed.');
+ 
+          navigate('/orders');
+        
+      }
+   } catch (error) {
       console.error('Payment error:', error.message);
       setLoading(false);
     }
+
   };
   
   return (

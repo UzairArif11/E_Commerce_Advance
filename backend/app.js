@@ -10,6 +10,7 @@ const adminRoutes = require('./routes/adminRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const userRoutes = require('./routes/userRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
+const settingRoutes = require('./routes/settingRoutes');
 
 const { notFound, errorHandler } = require('./middlewares/errorMiddleware');
 
@@ -36,6 +37,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/settings", settingRoutes);
 // Error Handling Middleware
 // After all your routes
 app.use(notFound);
