@@ -18,6 +18,7 @@ const PlaceOrderForm = () => {
   const stripe = useStripe();
   const elements = useElements();
   const [loading, setLoading] = useState(false);
+  const [loading2, setLoading2] = useState(false);
 
   const totalAmount = cartItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
@@ -39,7 +40,8 @@ const PlaceOrderForm = () => {
       } = await axiosInstance.post('/payments/stripe', {
         amount: totalAmount * 100, // Stripe expects amount in cents
         currency: 'usd',
-        cartItems
+        cartItems,
+        shippingAddress,
       });
   
       // 2. Confirm card payment
@@ -57,19 +59,23 @@ const PlaceOrderForm = () => {
       } else {
         if (result.paymentIntent.status === 'succeeded') {
           // 3. After successful payment, save order to backend
-          await axiosInstance.post('/orders', {
-            products: cartItems.map((item) => ({
-              product: item.productId,
-              quantity: item.quantity,
-              price: item.price,
-            })),
-            shippingAddress,
-            totalAmount,
+          // await axiosInstance.post('/orders', {
+          //   products: cartItems.map((item) => ({
+          //     product: item.productId,
+          //     quantity: item.quantity,
+          //     price: item.price,
+          //   })),
+          //   shippingAddress,
+          //   totalAmount,
  
-          });
-          toast.success('Payment Successful! 🎉 Order placed.');
+          // });
+
+
+          // toast.success('Payment Successful! 🎉 Order placed.');
  
-          navigate('/orders');
+          // navigate('/orders');
+          setLoading2(true)
+        
         }
       }
 
@@ -98,7 +104,14 @@ const PlaceOrderForm = () => {
     }
 
   };
-  
+  if (loading2) {
+  return (
+    <div className="flex justify-center items-center h-screen">
+      <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
+    </div>
+  );
+}
+
   return (
     <form onSubmit={handlePlaceOrder} className="space-y-8">
       <h2 className="text-2xl font-bold text-gray-800">Review Your Order</h2>

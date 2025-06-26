@@ -1,13 +1,14 @@
 // services/paymentService.js
 const stripe = require("stripe")(require("../config/env").STRIPE_SECRET_KEY);
-
-exports.createStripePaymentIntent = async (amount, currency = "usd") => {
+// Initialize Stripe webhook endpoint
+exports.createStripePaymentIntent = async (amount, currency = "usd", metadata ) => {
   try {
     // Create a new payment intent using Stripe API
     const paymentIntent = await stripe.paymentIntents.create({
       amount,
       // amount in the smallest currency unit (e.g., cents)
       currency,
+      metadata: metadata || {},
     });
     return paymentIntent;
   } catch (error) {

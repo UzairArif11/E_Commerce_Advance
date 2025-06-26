@@ -4,14 +4,17 @@ const { check } = require("express-validator");
 const router = express.Router();
 const paymentController = require("../controllers/paymentController");
 const validateRequest = require("../middlewares/validationMiddleware");
+const { auth } = require("../middlewares/authMiddleware");
 // @route POST /api/payments/stripe
 // @desc Create a Stripe payment intent
 // @access Protected (User)
 router.post(
   "/stripe",
+   auth,
   [
-    check("amount", "Amount is required and must be a number").isNumeric(),
+    check("cartItems", "cartItems is required and must be a array").isArray(),
     check("currency", "Currency is required").notEmpty(),
+    check("shippingAddress", "Shipping address is required").notEmpty(),
   ],
   validateRequest,
   paymentController.createStripePayment

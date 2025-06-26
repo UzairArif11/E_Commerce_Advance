@@ -5,11 +5,13 @@ const {
   processJazzCashPayment,
   processEasyPaisaPayment,
 } = require("../services/paymentService");
+
 exports.createStripePayment = async (req, res) => {
-  const { cartItems, currency } = req.body;
+  const { cartItems, currency ,shippingAddress} = req.body;
 
   try {
-    // Get product details from DB
+    // Get product prices from DB
+          const userId = req.user._id;
     const products = await Product.find({
       _id: { $in: cartItems.map((item) => item.productId) },
     });
@@ -29,15 +31,20 @@ exports.createStripePayment = async (req, res) => {
 
     const paymentIntent = await createStripePaymentIntent(
       totalAmount * 100,
-      currency
-    );
+      currency,
+        {
+        userId,
+        cartItems: JSON.stringify(cartItems),
+        shippingAddress
+      },
+);
 
     res.json({ paymentIntent });
   } catch (error) {
     console.error('Error creating Stripe payment intent:', error.message);
     res.status(500).send('Server error');
   }
-}
+};
 exports.jazzCashPayment = async (req, res) => {
   const paymentData = req.body;
   try {

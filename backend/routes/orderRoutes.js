@@ -26,12 +26,12 @@ router.post(
 // @route   GET /api/orders/:id
 // @desc    Get order by ID
 // @access  Protected (User/Admin)
-router.get('/:id', orderController.getOrderById);
+router.get('/:id', auth, orderController.getOrderById);
 
 // @route   GET /api/orders/user/:userId
 // @desc    Get all orders for a specific user
 // @access  Protected (User/Admin)
-router.get('/user/:userId', orderController.getUserOrders);
+router.get('/user/:userId', auth,orderController.getUserOrders);
 
 // @route   PUT /api/orders/:id/status
 // @desc    Update order status (e.g., pending to shipped)

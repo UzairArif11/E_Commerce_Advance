@@ -6,6 +6,7 @@ const authRoutes = require('./routes/authRoutes');
 const productRoutes = require('./routes/productRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
+const stripeWebhook = require('./routes/stripeWebhook');
 const adminRoutes = require('./routes/adminRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const userRoutes = require('./routes/userRoutes');
@@ -20,10 +21,18 @@ const app = express();
 // Connect to MongoDB
 dbConnect();
 
-// Global Middlewares
+
+// 👇 Apply raw middleware for Stripe BEFORE body parser
+app.use('/api/stripeWebhook', express.raw({ type: 'application/json' }));
+
+// 👇 Your normal body parser AFTER webhook
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+
 app.use(cors({ origin: 'http://localhost:5173' })); 
 
+app.use('/api/stripeWebhook', stripeWebhook);
 // Base Route
 app.get('/', (req, res) => {
   res.send('eCommerce API is up and running');

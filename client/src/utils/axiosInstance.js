@@ -1,5 +1,6 @@
 // src/utils/axiosInstance.js
 import axios from 'axios';
+import { logout } from '../redux/slices/authSlice';
 
 let store; // this will hold your Redux store
 
@@ -35,7 +36,11 @@ axiosInstance.interceptors.response.use(
 
     if (status === 401  ) {
 // If the user is not authenticated, logout and redirect to login
-alert("You are not authenticated. Please log in again.");
+ store.dispatch(logout());
+      // if (window.location.pathname !== '/login') {
+      //   window.location.href = '/login';
+      // }
+
     
     }
 

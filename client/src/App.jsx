@@ -1,20 +1,24 @@
-// src/App.js
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-
+import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
 import React, { Suspense, lazy, useEffect } from "react";
 import ErrorBoundary from "./components/ErrorBoundary";
+import Layout from "./components/Layout";
+import PrivateRoute from "./components/PrivateRoute";
+import AdminRoute from "./components/AdminRoute";
+import { toast } from "react-hot-toast";
+import { addNotification } from "./redux/slices/notificationSlice";
+import { useDispatch, useSelector } from "react-redux";
+import io from "socket.io-client";
+import axiosInstance from "./utils/axiosInstance";
 
+// Lazy-loaded Pages
 const HomePage = lazy(() => import("./pages/HomePage"));
 const ProductPage = lazy(() => import("./pages/ProductPage"));
 const CartPage = lazy(() => import("./pages/CartPage"));
 const LoginPage = lazy(() => import("./pages/LoginPage"));
 const RegisterPage = lazy(() => import("./pages/RegisterPage"));
-import Layout from "./components/Layout";
 const CheckoutPage = lazy(() => import("./pages/CheckoutPage"));
 const PlaceOrderPage = lazy(() => import("./pages/PlaceOrderPage"));
 const OrdersPage = lazy(() => import("./pages/OrdersPage"));
-import PrivateRoute from "./components/PrivateRoute";
-import AdminRoute from "./components/AdminRoute";
 const UserProfilePage = lazy(() => import("./pages/UserProfilePage"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
 const AdminProductsPage = lazy(() => import("./pages/AdminProductsPage"));
@@ -25,61 +29,125 @@ const AdminUsersPage = lazy(() => import("./pages/AdminUsersPage"));
 const WishlistPage = lazy(() => import("./pages/WishlistPage"));
 const AdminBroadcastPage = lazy(() => import("./pages/AdminBroadcastPage"));
 const UserSettingsPage = lazy(() => import("./pages/UserSettingsPage"));
- 
-const AdminNotificationsPage = lazy(() =>
-  import("./pages/AdminNotificationsPage")
-);
+const AdminNotificationsPage = lazy(() => import("./pages/AdminNotificationsPage"));
 const NotificationsPage = lazy(() => import("./pages/NotificationsPage"));
-import { toast } from "react-hot-toast";
-import { addNotification } from "./redux/slices/notificationSlice";
-import { useDispatch, useSelector } from "react-redux";
-import io from "socket.io-client";
-import axiosInstance from "./utils/axiosInstance";
 
-function App() {
-  const { userInfo } = useSelector((state) => state.auth);
+function SocketHandler({ userInfo }) {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const playNotificationSound = () => {
     const audio = new Audio("/sounds/notification.mp3");
     audio.play().catch((error) => {
       console.warn("Notification sound not played:", error.message);
     });
   };
-const sendBrowserNotification = (title, body) => {
-  if (
-    userInfo?.wantsPushNotifications &&
-    Notification.permission === 'granted'
-  ) {
-    navigator.serviceWorker.ready.then((registration) => {
-      registration.showNotification(title, {
-        body,
-             icon: '/vite.svg',
+
+  const sendBrowserNotification = (title, body) => {
+    if (
+      userInfo?.wantsPushNotifications &&
+      Notification.permission === "granted"
+    ) {
+      navigator.serviceWorker.ready.then((registration) => {
+        registration.showNotification(title, {
+          body,
+          icon: "/vite.svg",
+        });
       });
+    }
+  };
+
+  useEffect(() => {
+    if (!userInfo) return;
+
+    const socket = io(import.meta.env.VITE_APP_SOCKET_URL, {
+      auth: { token: userInfo.token },
     });
-  }
-};
 
+    socket.on("user_shipped", (data) => {
+      playNotificationSound();
+      sendBrowserNotification("New Announcement", data.message);
+      toast.success(data.message);
+      dispatch(addNotification({ message: data.message, read: false }));
+    });
 
-const requestNotificationPermission = async () => {
-  if ('Notification' in window && Notification.permission !== 'granted') {
-    const permission = await Notification.requestPermission();
-    console.log('Notification permission status:', permission);
-  }
-};
+    socket.on("user_cancelled", (data) => {
+      playNotificationSound();
+      sendBrowserNotification("New Announcement", data.message);
+      toast.success(data.message);
+      dispatch(addNotification({ message: data.message, read: false }));
+    });
 
-useEffect(() => {
-  requestNotificationPermission();
-}, []);
+    socket.on("user_delivered", (data) => {
+      playNotificationSound();
+      sendBrowserNotification("New Announcement", data.message);
+      toast.success(data.message);
+      dispatch(addNotification({ message: data.message, type: "delivered", read: false }));
+    });
+
+    socket.on("admin_orderPlaced", (data) => {
+      playNotificationSound();
+      sendBrowserNotification("New Announcement", data.message);
+      toast.success(data.message);
+      dispatch(addNotification({ type: "placed", ...data, read: false }));
+    });
+
+    socket.on("admin_orderShipped", (data) => {
+      playNotificationSound();
+      sendBrowserNotification("New Announcement", data.message);
+      toast.success(data.message);
+      dispatch(addNotification({ type: "shipped", ...data, read: false }));
+    });
+
+    socket.on("admin_orderCancelled", (data) => {
+      playNotificationSound();
+      sendBrowserNotification("New Announcement", data.message);
+      toast.success(data.message);
+      dispatch(addNotification({ type: "cancelled", ...data, read: false }));
+    });
+
+    socket.on("user_broadcast", (data) => {
+      playNotificationSound();
+      sendBrowserNotification("New Announcement", data.message);
+      toast.success(`Announcement: ${data.message}`);
+      dispatch(addNotification({ message: data.message, read: false }));
+    });
+
+    socket.on("user_strip", (data) => {
+      playNotificationSound();
+      toast.success("Payment Successful! 🎉 Order placed.");
+      navigate("/orders");
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [userInfo]);
+
+  return null;
+}
+
+function App() {
+  const { userInfo } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const requestNotificationPermission = async () => {
+      if ("Notification" in window && Notification.permission !== "granted") {
+        const permission = await Notification.requestPermission();
+        console.log("Notification permission status:", permission);
+      }
+    };
+    requestNotificationPermission();
+  }, []);
 
   useEffect(() => {
     const fetchNotificationsFromDB = async () => {
       try {
         const { data } = await axiosInstance.get("/notifications");
-        data.forEach((n) => {
-          dispatch(
-            addNotification({ _id: n._id, message: n.message, read: n.read })
-          );
-        });
+        data?.notifications.forEach((n) =>
+          dispatch(addNotification({ _id: n._id, message: n.message, read: n.read }))
+        );
       } catch (error) {
         console.error("Failed to load notifications:", error.message);
       }
@@ -89,80 +157,11 @@ useEffect(() => {
       fetchNotificationsFromDB();
     }
   }, [userInfo]);
-  useEffect(() => {
-    if (!userInfo) return;
-    // App.js or wherever you're connecting
-    const socket = io(import.meta.env.VITE_APP_SOCKET_URL, {
-      auth: {
-        token: userInfo?.token,
-      },
-    });
 
-    // Listen to real-time events
-
-    socket.on(`user_shipped`, (data) => {
-      playNotificationSound();
-       sendBrowserNotification('New Announcement', data.message);
-      toast.success(data.message);
-      dispatch(addNotification({ message: data.message, read: false }));
-    });
-
-    socket.on(`user_cancelled`, (data) => {
-      playNotificationSound();
-       sendBrowserNotification('New Announcement', data.message);
-      toast.success(data.message);
-      dispatch(addNotification({ message: data.message, read: false }));
-    });
-
-    socket.on(`user_delivered`, (data) => {
-      playNotificationSound();
-       sendBrowserNotification('New Announcement', data.message);
-      toast.success(data.message);
-      dispatch(
-        addNotification({
-          message: data.message,
-          type: "delivered",
-          read: false,
-        })
-      );
-    });
-
-    socket.on("admin_orderPlaced", (data) => {
-          playNotificationSound();
-       sendBrowserNotification('New Announcement', data.message);
-      // setNotifications((prev) => [{ type: 'placed', ...data }, ...prev]);
-      toast.success(data.message);
-      dispatch(addNotification({ type: "placed", ...data, read: false }));
-    });
-
-    socket.on("admin_orderShipped", (data) => {
-      playNotificationSound();
-       sendBrowserNotification('New Announcement', data.message);
-      // setNotifications((prev) => [{ type: 'shipped', ...data }, ...prev]);
-      toast.success(data.message);
-      dispatch(addNotification({ type: "shipped", ...data, read: false }));
-    });
-
-    socket.on("admin_orderCancelled", (data) => {
-      playNotificationSound();
-       sendBrowserNotification('New Announcement', data.message);
-      // setNotifications((prev) => [{ type: 'cancelled', ...data }, ...prev]);
-      toast.success(data.message);
-      dispatch(addNotification({ type: "cancelled", ...data, read: false }));
-    });
-    socket.on(`user_broadcast`, (data) => {
-      playNotificationSound();
-       sendBrowserNotification('New Announcement', data.message);
-      toast.success(`Announcement: ${data.message}`);
-      dispatch(addNotification({ message: data.message, read: false }));
-    });
-    return () => {
-      socket.disconnect();
-    };
-  }, [userInfo]);
   return (
     <ErrorBoundary>
       <Router>
+        <SocketHandler userInfo={userInfo} />
         <Layout>
           <Suspense
             fallback={
@@ -177,106 +176,18 @@ useEffect(() => {
               <Route path="/cart" element={<CartPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
-              <Route
-                path="/settings"
-                element={
-                  <PrivateRoute>
-                    
-                    <UserSettingsPage /> 
-                  </PrivateRoute>
-                }
-              />
-              <Route
-                path="/checkout"
-                element={
-                  <PrivateRoute>
-                    <CheckoutPage />
-                  </PrivateRoute>
-                }
-              />
-
-              <Route
-                path="/placeorder"
-                element={
-                  <PrivateRoute>
-                    <PlaceOrderPage />
-                  </PrivateRoute>
-                }
-              />
-
-              <Route
-                path="/orders"
-                element={
-                  <PrivateRoute>
-                    <OrdersPage />
-                  </PrivateRoute>
-                }
-              />
-
-              <Route
-                path="/admin/dashboard"
-                element={
-                  <AdminRoute>
-                    <AdminDashboard />
-                  </AdminRoute>
-                }
-              />
-
-              <Route
-                path="/admin/products"
-                element={
-                  <AdminRoute>
-                    <AdminProductsPage />
-                  </AdminRoute>
-                }
-              />
-
-              <Route
-                path="/admin/products/create"
-                element={
-                  <AdminRoute>
-                    <AdminAddProductPage />
-                  </AdminRoute>
-                }
-              />
-              <Route
-                path="/admin/broadcast"
-                element={
-                  <AdminRoute>
-                    {" "}
-                    <AdminBroadcastPage />{" "}
-                  </AdminRoute>
-                }
-              />
-              <Route
-                path="/admin/products/edit/:id"
-                element={
-                  <AdminRoute>
-                    <AdminEditProductPage />
-                  </AdminRoute>
-                }
-              />
-
-              <Route
-                path="/admin/orders"
-                element={
-                  <AdminRoute>
-                    {" "}
-                    <AdminOrdersPage />{" "}
-                  </AdminRoute>
-                }
-              />
-              <Route
-                path="/admin/users"
-                element={
-                  <AdminRoute>
-                    {" "}
-                    <AdminUsersPage />{" "}
-                  </AdminRoute>
-                }
-              />
-
-              <Route
+              <Route path="/settings" element={<PrivateRoute><UserSettingsPage /></PrivateRoute>} />
+              <Route path="/checkout" element={<PrivateRoute><CheckoutPage /></PrivateRoute>} />
+              <Route path="/placeorder" element={<PrivateRoute><PlaceOrderPage /></PrivateRoute>} />
+              <Route path="/orders" element={<PrivateRoute><OrdersPage /></PrivateRoute>} />
+              <Route path="/admin/dashboard" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+              <Route path="/admin/products" element={<AdminRoute><AdminProductsPage /></AdminRoute>} />
+              <Route path="/admin/products/create" element={<AdminRoute><AdminAddProductPage /></AdminRoute>} />
+              <Route path="/admin/broadcast" element={<AdminRoute><AdminBroadcastPage /></AdminRoute>} />
+              <Route path="/admin/products/edit/:id" element={<AdminRoute><AdminEditProductPage /></AdminRoute>} />
+              <Route path="/admin/orders" element={<AdminRoute><AdminOrdersPage /></AdminRoute>} />
+              <Route path="/admin/users" element={<AdminRoute><AdminUsersPage /></AdminRoute>} />
+               <Route
                 path="/profile"
                 element={
                   <PrivateRoute>
@@ -284,44 +195,10 @@ useEffect(() => {
                   </PrivateRoute>
                 }
               />
-              <Route
-                path="*"
-                element={
-                  <div className="flex justify-center items-center h-screen">
-                    <h1 className="text-4xl font-bold text-gray-800">
-                      404 - Page Not Found
-                    </h1>
-                  </div>
-                }
-              />
-
-              <Route
-                path="/wishlist"
-                element={
-                  <PrivateRoute>
-                    <WishlistPage />
-                  </PrivateRoute>
-                }
-              />
-              <Route
-                path="/admin/notifications"
-                element={
-                  <AdminRoute>
-                    {" "}
-                    <AdminNotificationsPage />{" "}
-                  </AdminRoute>
-                }
-              />
-
-              <Route
-                path="/notifications"
-                element={
-                  <PrivateRoute>
-                    {" "}
-                    <NotificationsPage />{" "}
-                  </PrivateRoute>
-                }
-              />
+              <Route path="/wishlist" element={<PrivateRoute><WishlistPage /></PrivateRoute>} />
+              <Route path="/notifications" element={<PrivateRoute><NotificationsPage /></PrivateRoute>} />
+              <Route path="/admin/notifications" element={<AdminRoute><AdminNotificationsPage /></AdminRoute>} />
+              <Route path="*" element={<div className="flex justify-center items-center h-screen"><h1 className="text-4xl font-bold text-gray-800">404 - Page Not Found</h1></div>} />
             </Routes>
           </Suspense>
         </Layout>
