@@ -15,6 +15,7 @@ const HomePage = lazy(() => import("./pages/HomePage"));
 const ProductPage = lazy(() => import("./pages/ProductPage"));
 const CartPage = lazy(() => import("./pages/CartPage"));
 const LoginPage = lazy(() => import("./pages/LoginPage"));
+const VerifyPage = lazy(() => import("./pages/VerifyPage"));
 const RegisterPage = lazy(() => import("./pages/RegisterPage"));
 const CheckoutPage = lazy(() => import("./pages/CheckoutPage"));
 const PlaceOrderPage = lazy(() => import("./pages/PlaceOrderPage"));
@@ -26,6 +27,7 @@ const AdminAddProductPage = lazy(() => import("./pages/AdminAddProductPage"));
 const AdminEditProductPage = lazy(() => import("./pages/AdminEditProductPage"));
 const AdminOrdersPage = lazy(() => import("./pages/AdminOrdersPage"));
 const AdminUsersPage = lazy(() => import("./pages/AdminUsersPage"));
+const AdminSettingsPage = lazy(() => import("./pages/AdminSettingsPage"));
 const WishlistPage = lazy(() => import("./pages/WishlistPage"));
 const AdminBroadcastPage = lazy(() => import("./pages/AdminBroadcastPage"));
 const UserSettingsPage = lazy(() => import("./pages/UserSettingsPage"));
@@ -175,6 +177,7 @@ function App() {
               <Route path="/product/:id" element={<ProductPage />} />
               <Route path="/cart" element={<CartPage />} />
               <Route path="/login" element={<LoginPage />} />
+              <Route path="/verify" element={<VerifyPage />} />
               <Route path="/register" element={<RegisterPage />} />
               <Route path="/settings" element={<PrivateRoute><UserSettingsPage /></PrivateRoute>} />
               <Route path="/checkout" element={<PrivateRoute><CheckoutPage /></PrivateRoute>} />
@@ -187,6 +190,7 @@ function App() {
               <Route path="/admin/products/edit/:id" element={<AdminRoute><AdminEditProductPage /></AdminRoute>} />
               <Route path="/admin/orders" element={<AdminRoute><AdminOrdersPage /></AdminRoute>} />
               <Route path="/admin/users" element={<AdminRoute><AdminUsersPage /></AdminRoute>} />
+              <Route path="/admin/setting" element={<AdminRoute><AdminSettingsPage /></AdminRoute>} />
                <Route
                 path="/profile"
                 element={

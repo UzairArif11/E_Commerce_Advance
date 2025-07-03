@@ -14,7 +14,7 @@ const RegisterPage = () => {
     try {
       await axiosInstance.post('/auth/signup', { name, email, password });
       alert('Registration successful. Please verify your email.');
-      navigate('/login');
+   navigate('/verify', { state: { email } });
     } catch (error) {
       console.error('Register error:', error.message);
       alert('Registration failed.');

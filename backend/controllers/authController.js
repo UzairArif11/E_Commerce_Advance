@@ -10,29 +10,44 @@ exports.signup = async (req, res) => {
   try {
     // Check if user already exists
     let user = await User.findOne({ email });
-    if (user) {
+
+    // User exists and is verified
+    if (user && user.isVerified) {
       return res.status(400).json({ errors: [{ msg: 'User already exists' }] });
     }
 
-    // Create new user instance
-    user = new User({ name, email, password });
-
-    // Encrypt the password
-    const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(password, salt);
-
-    // Generate OTP and set expiry (10 minutes)
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    user.otp = otp;
-    user.otpExpires = Date.now() + 10 * 60 * 1000; // 10 minutes in milliseconds
+    const otpExpires = Date.now() + 10 * 60 * 1000; // 10 mins
 
-    // Save the user to the database
-    await user.save();
+    if (user && !user.isVerified) {
+      // Update unverified user with new details
+      user.name = name;
+      const salt = await bcrypt.genSalt(10);
+      user.password = await bcrypt.hash(password, salt);
+      user.otp = otp;
+      user.otpExpires = otpExpires;
+      await user.save();
+    } else {
+      // Create new user
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Send OTP Email for verification
+      user = new User({
+        name,
+        email,
+        password: hashedPassword,
+        otp,
+        otpExpires,
+      });
+      await user.save();
+    }
+
+    // Send OTP Email
     await sendOTPEmail(email, otp);
 
-    res.json({ msg: 'Registration successful. Please verify your email using the OTP sent to your email.' });
+    res.json({
+      msg: 'Registration successful. Please verify your email using the OTP sent to your email.',
+    });
   } catch (err) {
     console.error('Error in signup:', err.message);
     res.status(500).send('Server error');

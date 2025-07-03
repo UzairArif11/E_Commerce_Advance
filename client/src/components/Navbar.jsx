@@ -6,6 +6,7 @@ import { logout } from '../redux/slices/authSlice';
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import { Menu as BurgerMenu, X } from 'lucide-react';
+import { persistor } from '../redux/store';
 
 const Navbar = () => {
   const { notifications } = useSelector((state) => state.notifications);
@@ -19,6 +20,7 @@ const Navbar = () => {
 
   const handleLogout = () => {
     dispatch(logout());
+     persistor.purge();
   };
 
   const handleOpen = (event) => {
