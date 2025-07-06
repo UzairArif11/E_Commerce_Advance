@@ -33,6 +33,12 @@ const AdminBroadcastPage = lazy(() => import("./pages/AdminBroadcastPage"));
 const UserSettingsPage = lazy(() => import("./pages/UserSettingsPage"));
 const AdminNotificationsPage = lazy(() => import("./pages/AdminNotificationsPage"));
 const NotificationsPage = lazy(() => import("./pages/NotificationsPage"));
+const AdminProfilePage = lazy(() => import("./pages/AdminProfilePage"));
+const AdminAnalyticsPage = lazy(() => import("./pages/AdminAnalyticsPage"));
+const AdminCategoriesPage = lazy(() => import("./pages/AdminCategoriesPage"));
+const AdminReportsPage = lazy(() => import("./pages/AdminReportsPage"));
+const AdminInventoryPage = lazy(() => import("./pages/AdminInventoryPage"));
+const TestPage = lazy(() => import("./pages/TestPage"));
 
 function SocketHandler({ userInfo }) {
   const dispatch = useDispatch();
@@ -191,6 +197,11 @@ function App() {
               <Route path="/admin/orders" element={<AdminRoute><AdminOrdersPage /></AdminRoute>} />
               <Route path="/admin/users" element={<AdminRoute><AdminUsersPage /></AdminRoute>} />
               <Route path="/admin/setting" element={<AdminRoute><AdminSettingsPage /></AdminRoute>} />
+              <Route path="/admin/profile" element={<AdminRoute><AdminProfilePage /></AdminRoute>} />
+              <Route path="/admin/analytics" element={<AdminRoute><AdminAnalyticsPage /></AdminRoute>} />
+              <Route path="/admin/categories" element={<AdminRoute><AdminCategoriesPage /></AdminRoute>} />
+              <Route path="/admin/reports" element={<AdminRoute><AdminReportsPage /></AdminRoute>} />
+              <Route path="/admin/inventory" element={<AdminRoute><AdminInventoryPage /></AdminRoute>} />
                <Route
                 path="/profile"
                 element={
@@ -202,6 +213,7 @@ function App() {
               <Route path="/wishlist" element={<PrivateRoute><WishlistPage /></PrivateRoute>} />
               <Route path="/notifications" element={<PrivateRoute><NotificationsPage /></PrivateRoute>} />
               <Route path="/admin/notifications" element={<AdminRoute><AdminNotificationsPage /></AdminRoute>} />
+              <Route path="/test" element={<TestPage />} />
               <Route path="*" element={<div className="flex justify-center items-center h-screen"><h1 className="text-4xl font-bold text-gray-800">404 - Page Not Found</h1></div>} />
             </Routes>
           </Suspense>

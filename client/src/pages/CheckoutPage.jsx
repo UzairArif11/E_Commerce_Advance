@@ -1,5 +1,4 @@
-// src/pages/CheckoutPage.jsx
-import { useState,useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setShippingAddress, setPaymentMethod } from '../redux/slices/checkoutSlice';
 import { useNavigate } from 'react-router-dom';
@@ -11,19 +10,33 @@ const CheckoutPage = () => {
   const { shippingAddress, paymentMethod } = useSelector((state) => state.checkout);
 
   const [address, setAddress] = useState(shippingAddress || '');
-  const [payment, setPayment] = useState(paymentMethod || 'Stripe');
+  const [payment, setPayment] = useState(paymentMethod || '');
   const [errors, setErrors] = useState({});
 
-    const [codAvailable, setCodAvailable] = useState(false);
+  // Payment method availability
+  const [paymentMethods, setPaymentMethods] = useState({
+    codEnabled: false,
+    jazzCashEnabled: false,
+    easypaisaEnabled: false,
+    cardEnabled: false,
+  });
 
   useEffect(() => {
     const fetchSettings = async () => {
-      const { data } = await axiosInstance.get('/settings');
-      setCodAvailable(data.codEnabled);
+      try {
+        const { data } = await axiosInstance.get('/settings');
+        setPaymentMethods({
+          codEnabled: data.codEnabled,
+          jazzCashEnabled: data.jazzCashEnabled,
+          easypaisaEnabled: data.easypaisaEnabled,
+          cardEnabled: data.cardEnabled,
+        });
+      } catch (error) {
+        console.error('Failed to load payment settings:', error.message);
+      }
     };
 
     fetchSettings();
-
   }, []);
 
   const handleSubmit = (e) => {
@@ -69,38 +82,67 @@ const CheckoutPage = () => {
             <p className="text-red-500 text-sm mt-1">{errors.address}</p>
           )}
         </div>
-  {codAvailable ? (
-        <p>Cash on Delivery is available</p>
-      ) : (
-        <p>Cash on Delivery is not available</p>
-      )}
+
         {/* Payment Method */}
         <div>
           <label className="block text-gray-700 font-medium mb-4">Payment Method</label>
           <div className="flex flex-col gap-4">
-            {['Stripe', 'JazzCash', 'EasyPaisa'].map((method) => (
-              <label key={method} className="flex items-center gap-3">
+            {paymentMethods.cardEnabled && (
+              <label className="flex items-center gap-3">
                 <input
                   type="radio"
                   name="paymentMethod"
-                  value={method}
-                  checked={payment === method}
+                  value="Stripe"
+                  checked={payment === 'Stripe'}
                   onChange={(e) => setPayment(e.target.value)}
                 />
-                {method}
+                Card
               </label>
-            ))}
+            )}
+
+            {paymentMethods.jazzCashEnabled && (
+              <label className="flex items-center gap-3">
+                <input
+                  type="radio"
+                  name="paymentMethod"
+                  value="JazzCash"
+                  checked={payment === 'JazzCash'}
+                  onChange={(e) => setPayment(e.target.value)}
+                />
+                JazzCash
+              </label>
+            )}
+
+            {paymentMethods.easypaisaEnabled && (
+              <label className="flex items-center gap-3">
+                <input
+                  type="radio"
+                  name="paymentMethod"
+                  value="EasyPaisa"
+                  checked={payment === 'EasyPaisa'}
+                  onChange={(e) => setPayment(e.target.value)}
+                />
+                EasyPaisa
+              </label>
+            )}
+
+            {paymentMethods.codEnabled && (
+              <label className="flex items-center gap-3">
+                <input
+                  type="radio"
+                  name="paymentMethod"
+                  value="CashOnDelivery"
+                  checked={payment === 'CashOnDelivery'}
+                  onChange={(e) => setPayment(e.target.value)}
+                />
+                Cash On Delivery (+Rs 100 Extra)
+              </label>
+            )}
+
             {errors.payment && (
               <p className="text-red-500 text-sm mt-1">{errors.payment}</p>
             )}
-            {codAvailable && 
-            ( 
-            <div> <input type="radio" name="paymentMethod" value="CashOnDelivery"   checked={payment === "CashOnDelivery" } onChange={(e) => setPayment(e.target.value)} />
-             <label className="ml-2">Cash On Delivery (+Rs 100 Extra)</label> 
-             </div>
-             )}
           </div>
-          
         </div>
 
         {/* Submit */}

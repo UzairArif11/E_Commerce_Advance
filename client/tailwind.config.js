@@ -1,12 +1,16 @@
-// tailwind.config.js
-module.exports = {
-    content: [
-      "./index.html",
-      "./src/**/*.{js,ts,jsx,tsx}", // ✅ Important for Vite + React
-    ],
-    theme: {
-      extend: {},
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {
+      fontFamily: {
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+      },
     },
-    plugins: [],
-  };
+  },
+  plugins: [],
+}
   
