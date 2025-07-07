@@ -30,7 +30,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 
-app.use(cors({ origin: 'http://localhost:https://e-commerce-advance-5zwij5at0-uzairs-projects-862ceb91.vercel.app' })); 
+app.use(cors({ origin: 'https://e-commerce-advance-5zwij5at0-uzairs-projects-862ceb91.vercel.app' })); 
 
 app.use('/api/stripeWebhook', stripeWebhook);
 // Base Route
