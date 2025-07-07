@@ -8,7 +8,7 @@ module.exports = {
   init: (server) => {
       io = socketio(server, {
       cors: {
-        origin: 'http://localhost:5173',
+        origin: 'https://e-commerce-advance-5zwij5at0-uzairs-projects-862ceb91.vercel.app',
         methods: ['GET', 'POST'],
       },
     });
