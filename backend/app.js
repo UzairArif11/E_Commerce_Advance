@@ -30,7 +30,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 
-app.use(cors({ origin: 'https://e-commerce-advance-git-main-uzairs-projects-862ceb91.vercel.app' })); 
+app.use(cors({ origin: 'https://e-commerce-advance-tau.vercel.app' })); 
 
 app.use('/api/stripeWebhook', stripeWebhook);
 // Base Route
