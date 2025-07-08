@@ -5,6 +5,11 @@ const router = express.Router();
 const productController = require('../controllers/productController');
 const validateRequest = require('../middlewares/validationMiddleware');
 
+// @route   GET /api/products/search
+// @desc    Search products
+// @access  Public
+router.get('/search', productController.searchProducts);
+
 // @route   GET /api/products
 // @desc    Get all products
 // @access  Public

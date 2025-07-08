@@ -1,6 +1,27 @@
 // controllers/productController.js
 const Product = require('../models/Product');
 
+exports.searchProducts = async (req, res) => {
+  try {
+    const { q } = req.query;
+    if (!q) {
+      return res.status(400).json({ msg: 'Search query is required' });
+    }
+    
+    const products = await Product.find({
+      $or: [
+        { name: { $regex: q, $options: 'i' } },
+        { description: { $regex: q, $options: 'i' } }
+      ]
+    }).populate('category', 'name');
+    
+    res.json(products);
+  } catch (err) {
+    console.error('Error searching products:', err.message);
+    res.status(500).send('Server error');
+  }
+};
+
 exports.getAllProducts = async (req, res) => {
   try {
     const products = await Product.find().populate('category', 'name');

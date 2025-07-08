@@ -30,7 +30,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 
-app.use(cors({ origin: 'http://localhost:5173' })); 
+app.use(cors({ 
+  origin: ['http://localhost:5173', 'exp://192.168.1.139:8082', 'http://192.168.1.139:8082'],
+  credentials: true 
+}));
 
 app.use('/api/stripeWebhook', stripeWebhook);
 // Base Route

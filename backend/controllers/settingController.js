@@ -12,7 +12,12 @@ const getSettings = async (req, res) => {
 
 // Update COD (Cash on Delivery) setting
 const updateCodSetting = async (req, res) => {
-  const { codEnabled } = req.body;
+  const {
+      codEnabled,
+      jazzCashEnabled,
+      easypaisaEnabled,
+      cardEnabled,
+    } = req.body;
 
   let setting = await Setting.findOne();
   if (!setting) {
@@ -20,6 +25,9 @@ const updateCodSetting = async (req, res) => {
   }
 
   setting.codEnabled = codEnabled;
+  setting.jazzCashEnabled = jazzCashEnabled;
+  setting.easypaisaEnabled = easypaisaEnabled;
+  setting.cardEnabled = cardEnabled;
   await setting.save();
 
   res.json(setting);
